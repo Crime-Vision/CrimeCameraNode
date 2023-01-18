@@ -9,6 +9,7 @@ var config = {}
 
 const execCommand = (command,sanitize=null) => {
   try {
+    debug(command);
     return exec(command)
   } catch(e) {
     debug("COMMAND FAILED")

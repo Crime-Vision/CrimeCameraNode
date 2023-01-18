@@ -10,16 +10,28 @@
 //
 // operational:
 //  - critical services: 
-//    - store videos (with checksum), 
-//    - stream videos, 
-//    - clean videos, 
-//    - heartbeat
+//    - Store Video: NVR-JS handles this
+//    - Stream Video: restreamer handles this, see RtspToWEB, 
+//    - clean storage 
+//    - heartbeat: Critical for map functionality and monitoring
 
 
 const debug = require('debug')('CrimeCameraNodeSlim');
 debug.enabled = true
 
 require('dotenv').config();
+
+if(typeof(process.env.CAMERA_NETWORK_INTERFACE_NAME) == 'undefined' || 
+   typeof(process.env.NODE_IDENTIFIER) == 'undefined' || 
+   typeof(process.env.NODE_SERVER) == 'undefined' || 
+   typeof(process.env.ZEROTIER_INTERFACE_NAME) == 'undefined') {
+  debug("!!! ERROR:")
+  debug("You MUST fill out the following fields in a .env before proceeding!")
+  debug("NODE_IDENTIFIER, NODE_SERVER, ZEROTIER_INTERFACE_NAME, CAMERA_NETWORK_INTERFACE_NAME")
+  debug("See README")
+  return;
+}
+
 
 async function main() {
   while(true) {

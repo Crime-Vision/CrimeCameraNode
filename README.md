@@ -1,3 +1,14 @@
+# Quick Start
+
+## SAMPLE .env
+
+```
+NODE_IDENTIFIER=DEMO001
+NODE_SERVER=http://demo.your-server.com:3000
+ZEROTIER_INTERFACE_NAME=ztxxxxxxx
+CAMERA_NETWORK_INTERFACE_NAME=ethX
+```
+
 # City of Shreveport's Open Source Public Safety Camera
 
 This repository is one of several that composes a simple system for secure storage, access, and retrieval of commodity ONVIF cameras connected over PoE to a Raspberry Pi. 

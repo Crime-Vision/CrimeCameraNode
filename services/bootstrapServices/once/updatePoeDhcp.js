@@ -34,7 +34,7 @@ async function run() {
       option interface_mtu
       require dhcp_server_identifier
       slaac private
-      interface eth1
+      interface ${process.env.CAMERA_NETWORK_INTERFACE_NAME}
       static ip_address=10.10.5.1/24
     `
   );

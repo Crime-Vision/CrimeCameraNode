@@ -34,7 +34,7 @@ async function run() {
     debug(data);
 
     try {
-      await axios.post(`${process.env.NODE_SERVER}/api/heartbeats`, data)
+      //await axios.post(`${process.env.NODE_SERVER}/api/heartbeats`, data)
       await axios.post(`${process.env.NODE_SERVER}/api/nodes/checkin/${process.env.NODE_IDENTIFIER}`, data)
 
       debug("Heartbeat Completed. Sleeping 60 seconds...");
