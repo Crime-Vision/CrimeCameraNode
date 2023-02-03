@@ -29,6 +29,8 @@ async function everyBoot() {
   await require("./everyBoot/setupRamDisk").run();
   await require("./everyBoot/cacheCameraConfig").run();
   await require("./everyBoot/setupStorage").run()
+  debug("Beginning NVRJS Config Overwrite")
+  await require("./everyBoot/writeNvrJsConfig.js").run();
   debug("Completed everyBoot Procedures");
 }
 
