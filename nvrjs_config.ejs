@@ -20,17 +20,6 @@ module.exports = {
                 eventSensorIdCoolOffSeconds: 60
         },
         cameras: {
-        /* Cameras */
-	/*****
-	* {
-	*  localIP: '10.10.5.3',
-	*  rtspURL: 'rtsp://stream:Super$Secret$1@10.1.1.1:555/cam/realmonitor?channel=1&subtype=1',
-	*  ptz: false,
-	*  humanReadableName: 'Demo Pole Camera - Center',
-	*  cameraNumber: 2
-	* }
-
-	*****/
 	<% config.cameras.forEach(camera => { %>
                 'camera<%= camera.cameraNumber %>': {
                         name: '<%= camera.humanReadableName %>',
@@ -44,7 +33,7 @@ module.exports = {
                                 rtsp_transport: 'tcp'
                         },
                         /* Input Address */
-                        input: 'rtsp://<%= camera.localRTSPUsername %>:<%= camera.localRTSPPassword %>@<%= camera.localIP %>:554<%= camera.localRTSPPath %>',
+                        input: 'rtsp://<%= camera.localRTSPUsername %>:<%= camera.localRTSPPassword %>@<%= camera.localIP %>:554<%- camera.localRTSPPath %>',
                         /* Only use these if the incoming stream is not already h264/5 */
                         /* Note that depending on the encoder in use, The CPU could be taxed */
                         /* The below will use the HW assisted h264 encoder for RPi4 */
