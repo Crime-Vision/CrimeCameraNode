@@ -30,7 +30,7 @@ async function run() {
   config.cameras.forEach(camera => {
     command += "\n" + dedent`
       sudo iptables -t nat -A PREROUTING -p tcp -s 0/0 -d ${config.ip} --dport ${553 + parseInt(camera.cameraNumber)} -j DNAT --to ${camera.localIP}:554;
-      sudo iptables -A FORWARD -p tcp -d ${config.ip} --dport  -j ACCEPT;
+      sudo iptables -A FORWARD -p tcp -d ${config.ip} --dport ${553 + parseInt(camera.cameraNumber)} -j ACCEPT;
       sudo iptables -t nat -A PREROUTING -p tcp -s 0/0 -d ${config.ip} --dport ${80 + parseInt(camera.cameraNumber)} -j DNAT --to ${camera.localIP}:80;
       sudo iptables -A FORWARD -p tcp -d ${config.ip} --dport ${80 + parseInt(camera.cameraNumber)} -j ACCEPT;
     `

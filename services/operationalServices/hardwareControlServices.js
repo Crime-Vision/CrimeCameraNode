@@ -1,14 +1,16 @@
 require('dotenv').config();
 
-const { WebSocketServer } = require('ws');
+const WebSocketServer = require('ws').Server;
 
 const debug = require('debug')('hardwareControlService');
 
 debug.enabled = true;
  
-const socketServer = new WebSocketServer({ port: 80 });
+var socketServer = null;
 
 async function run() {
+  socketServer = new WebSocketServer({port: 8888});
+
   socketServer.on('connection', ws => {
     console.log('New Client.');
     ws.send('Connection Established.');
@@ -23,4 +25,8 @@ async function run() {
       console.log('websocket error');
     }
   });
+}
+
+if (require.main === module) {
+  run(); 
 }
