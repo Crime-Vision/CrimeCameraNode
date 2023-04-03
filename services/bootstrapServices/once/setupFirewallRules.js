@@ -20,29 +20,28 @@ async function run() {
 
   debug('Loaded config. Setting up firewall rules...');
 
-  var {stdout, stderr} = await exec(dedent`
+  var command = dedent`
     sudo sysctl net.ipv4.conf.eth0.forwarding=1;
     sudo sysctl net.ipv4.conf.eth1.forwarding=1;
     sudo sysctl net.ipv4.conf.wlan0.forwarding=1;
     sudo sysctl net.ipv4.conf.${process.env.ZEROTIER_INTERFACE_NAME}.forwarding=1;
+  `
 
-    sudo iptables -t nat -A PREROUTING -p tcp -s 0/0 -d ${config.ip} --dport 554 -j DNAT --to 10.10.5.2:554;
-    sudo iptables -A FORWARD -p tcp -d ${config.ip} --dport 554 -j ACCEPT;
-    sudo iptables -t nat -A PREROUTING -p tcp -s 0/0 -d ${config.ip} --dport 81 -j DNAT --to 10.10.5.2:80;
-    sudo iptables -A FORWARD -p tcp -d ${config.ip} --dport 81 -j ACCEPT;
+  config.cameras.forEach(camera => {
+    command += "\n" + dedent`
+      sudo iptables -t nat -A PREROUTING -p tcp -s 0/0 -d ${config.ip} --dport ${553 + parseInt(camera.cameraNumber)} -j DNAT --to ${camera.localIP}:554;
+      sudo iptables -A FORWARD -p tcp -d ${config.ip} --dport  -j ACCEPT;
+      sudo iptables -t nat -A PREROUTING -p tcp -s 0/0 -d ${config.ip} --dport ${80 + parseInt(camera.cameraNumber)} -j DNAT --to ${camera.localIP}:80;
+      sudo iptables -A FORWARD -p tcp -d ${config.ip} --dport ${80 + parseInt(camera.cameraNumber)} -j ACCEPT;
+    `
+  });
 
-    sudo iptables -t nat -A PREROUTING -p tcp -s 0/0 -d ${config.ip} --dport 555 -j DNAT --to 10.10.5.3:554;
-    sudo iptables -A FORWARD -p tcp -d ${config.ip} --dport 555 -j ACCEPT;
-    sudo iptables -t nat -A PREROUTING -p tcp -s 0/0 -d ${config.ip} --dport 82 -j DNAT --to 10.10.5.3:80;
-    sudo iptables -A FORWARD -p tcp -d ${config.ip} --dport 82 -j ACCEPT;
-
-    sudo iptables -t nat -A PREROUTING -p tcp -s 0/0 -d ${config.ip} --dport 556 -j DNAT --to 10.10.5.4:554;
-    sudo iptables -A FORWARD -p tcp -d ${config.ip} --dport 556 -j ACCEPT;
-    sudo iptables -t nat -A PREROUTING -p tcp -s 0/0 -d ${config.ip} --dport 83 -j DNAT --to 10.10.5.4:80;
-    sudo iptables -A FORWARD -p tcp -d ${config.ip} --dport 83 -j ACCEPT;
-
+  command += "\n" + dedent`
     sudo iptables -t nat -A POSTROUTING -j MASQUERADE;
-  `);
+  `
+
+  debug(command)
+  var {stdout, stderr} = await exec(command);
 
   debug(stdout);
   debug(stderr);

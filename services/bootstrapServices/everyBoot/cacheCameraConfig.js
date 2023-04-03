@@ -8,25 +8,6 @@ debug.enabled = true
 async function cacheConfig() {
   debug('Beginning Cache Config Procedure');
 
-  var shouldPullConfig = false
-
-  var configString = ""
-
-  try { configString = fs.readFileSync('/mnt/ramdisk/config.json', 'utf8'); } catch(err) {}
-
-  try {
-    config = JSON.parse(configString);
-    if(config.videoDriveDevicePath) {
-    }
-  } catch(err) {
-    shouldPullConfig = true
-  }
-
-  if(!shouldPullConfig) {
-    debug("Skipping download of config, read from cache")
-    return true;
-  }
-
   var url = `${process.env.NODE_SERVER}/api/nodes/${process.env.NODE_IDENTIFIER}`;
 
   debug("Fetching config from: ")
