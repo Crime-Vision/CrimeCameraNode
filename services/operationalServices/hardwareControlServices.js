@@ -55,7 +55,11 @@ function startBroadcast(ws) {
         isBroadcasting = false;
         ws.send("broadcast: stopped");
       });
+    } else {
+      console.log("audioPlayerProcess was not null.");
     }
+  } else {
+    console.log(`isReadyToBroadcast: ${isReadyToBroadcast} | isBroadcasting: ${isBroadcasting}`);
   }
 
 }
@@ -70,7 +74,7 @@ async function run() {
     ws.on('close', () => { 
       console.log("Client has disconnected!.") 
       isReadyToBroadcast = false;
-      isBroadcasting = true;
+      isBroadcasting = false;
     });
 
     ws.on('message', event => {
