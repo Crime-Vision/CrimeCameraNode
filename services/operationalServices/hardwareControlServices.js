@@ -13,6 +13,7 @@ var socketServer = null;
 var isBroadcasting = false;
 var isReadyToBroadcast = false;
 var audioPlayerProcess = null;
+var lightIsFlashing = false;
 
 function writeAudioToDisk(data) {
   console.log("Saving buffer to disk as a .wav");
@@ -85,6 +86,26 @@ async function run() {
         console.log("Recognized blob data");
         writeAudioToDisk(event);
         ws.send("broadcast: ready");
+      }
+
+      if(event.toString().startsWith("light: ")) {
+        var cmd = event.toString().replace("light: ", "");
+        console.log("Received Lighting CMD: " + cmd);
+
+        if(cmd == "start") {
+          spawn("raspi-gpio", ["set", "4", "op"]);
+          spawn("raspi-gpio", ["set", "4", "dh"]);
+          lightIsFlashing = true;
+          ws.send("light: flashing");
+        }
+
+        if(cmd == "stop") {
+          spawn("raspi-gpio", ["set", "4", "op"]);
+          spawn("raspi-gpio", ["set", "4", "dl"]);
+          lightIsFlashing = false;
+          ws.send("light: stopped");
+        }
+
       }
 
       if(event.toString().startsWith("broadcast: ")) {
