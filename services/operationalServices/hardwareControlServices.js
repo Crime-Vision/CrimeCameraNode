@@ -34,7 +34,7 @@ function stopBroadcast(ws) {
 function startBroadcast(ws) {
   if(isReadyToBroadcast && !isBroadcasting) {
     if(audioPlayerProcess == null) {
-      audioPlayerProcess = spawn("sudo", ["mplayer", "/tmp/broadcast.wav"]);
+      audioPlayerProcess = spawn("sudo", ["mplayer", "-ao", "alsa:device=hw=3.0", "/tmp/broadcast.wav"]);
       isBroadcasting = true;
       ws.send("broadcast: started");
 
