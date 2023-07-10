@@ -14,6 +14,11 @@ var isBroadcasting = false;
 var isReadyToBroadcast = false;
 var audioPlayerProcess = null;
 var lightIsFlashing = false;
+var soundCard = 0;
+
+const soundRegex = /card (\d+): sndrpihifiberry/;
+
+
 
 function writeAudioToDisk(data) {
   console.log("Saving buffer to disk as a .wav");
@@ -34,28 +39,47 @@ function stopBroadcast(ws) {
 function startBroadcast(ws) {
   if(isReadyToBroadcast && !isBroadcasting) {
     if(audioPlayerProcess == null) {
-      audioPlayerProcess = spawn("sudo", ["mplayer", "-ao", "alsa:device=hw=3.0", "/tmp/broadcast.wav"]);
-      isBroadcasting = true;
-      ws.send("broadcast: started");
+      exec('aplay -l', (error, stdout) => {
+        if (error) {
+          console.error(`Error executing command: ${error.message}`);
+          return;
+        }
+      
+        // Extract the audio card information
+        const match = soundRegex.exec(stdout);
+        if (match) {
+          const cardNumber = match[1];
+		
+          audioPlayerProcess = spawn("sudo", ["mplayer", "-ao", `alsa:device=hw=${cardNumber}.0`, "/tmp/broadcast.wav"]);
 
-      audioPlayerProcess.stdout.on("data", data => {
-        console.log(`stdout: ${data}`);
-      });
+          isBroadcasting = true;
 
-      audioPlayerProcess.stderr.on("data", data => {
-        console.log(`stderr: ${data}`);
-      });
+          ws.send("broadcast: started");
+     
+          audioPlayerProcess.stdout.on("data", data => {
+            console.log(`stdout: ${data}`);
+          });
+     
+          audioPlayerProcess.stderr.on("data", data => {
+            console.log(`stderr: ${data}`);
+          });
+     
+          audioPlayerProcess.on('error', (error) => {
+            console.log(`error: ${error.message}`);
+          });
+     
+          audioPlayerProcess.on("close", code => {
+            console.log(`child process exited with code ${code}`);
+            audioPlayerProcess = null;
+            isBroadcasting = false;
+            ws.send("broadcast: stopped");
+          });
+              console.log(`Audio card number: ${cardNumber}`);
+            } else {
+              console.log('No matching audio card found.');
+            }
+          });
 
-      audioPlayerProcess.on('error', (error) => {
-        console.log(`error: ${error.message}`);
-      });
-
-      audioPlayerProcess.on("close", code => {
-        console.log(`child process exited with code ${code}`);
-        audioPlayerProcess = null;
-        isBroadcasting = false;
-        ws.send("broadcast: stopped");
-      });
     } else {
       console.log("audioPlayerProcess was not null.");
     }
